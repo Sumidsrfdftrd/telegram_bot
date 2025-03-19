@@ -5,9 +5,10 @@ import requests
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+mode_times = {"hacker": 0, "money": 0, "playboy": 0}
+current_mode = None
 # Load environment variables
 TOKEN = os.getenv("TOKEN")  # Set this in Railway's environment variables
-DATA_FILE = "user_modes.txt"
 PORT = int(os.environ.get("PORT", 8080))  # Railway assigns this dynamically
 
 # Function to set the Telegram bot webhook
@@ -42,40 +43,20 @@ class TelegramWebhookHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps({"status": "ok"}).encode())
 
-# Load and save user mode data
-def load_user_data():
-    try:
-        with open(DATA_FILE, "r") as file:
-            return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {"mode": None, "start_time": None, "total_time": {"hacker": 0, "money": 0, "playboy": 0}}
-
-def save_user_data(user_data):
-    with open(DATA_FILE, "w") as file:
-        json.dump(user_data, file)
-
 # Handle user messages
 def handle_message(text):
-    user_data = load_user_data()
     current_time = time.time()
-    
-    if user_data["mode"]:
-        elapsed_time = current_time - user_data["start_time"]
-        user_data["total_time"][user_data["mode"]] += elapsed_time
-    
-    user_data["start_time"] = current_time
-    save_user_data(user_data)
-    user_data = load_user_data()
+    if current_mode is not None:
+            elapsed_time = current_time - start_time
+            mode_times[current_mode] += elapsed_time
+    start_time = current_time
     if text in ["/hacker", "/money", "/playboy"]:
-        user_data["mode"] = text[1:]
-        save_user_data(user_data)
+        current_mode = text[1:]
         return f"Switched to {text[1:]} mode!"
-    
     elif text == "/summary":
-        total_time = user_data.get("total_time", {})
-        hacker = int(total_time.get("hacker", 0))
-        money = int(total_time.get("money", 0))
-        playboy = int(total_time.get("playboy", 0))
+        hacker = int(mode_times["hacker"])
+        money = int(mode_times["money"])
+        playboy = int(mode_times["playboy"])
 
         hacker_print = money_print = playboy_print = 0
 
@@ -95,9 +76,9 @@ def handle_message(text):
             "playboy_print": playboy_print
         }.items(), key=lambda x: x[1], reverse=True))
         
-        current_mode = user_data.get("mode", "Unknown").capitalize()
+        current_mode_print = current_mode.capitalize()
         message_lines = [f"{key.replace('_print', '').capitalize()} => {format_time(value)}" for key, value in sorted_values.items()]
-        return f"Current Mode: {current_mode}\n\n" + "\n\n".join(message_lines)
+        return f"Current Mode: {current_mode_print}\n\n" + "\n\n".join(message_lines)
     
     return "/hacker\n/money\n/playboy\n/summary"
 
