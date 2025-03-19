@@ -77,9 +77,8 @@ def handle_message(text):
             "playboy_print": playboy_print
         }.items(), key=lambda x: x[1], reverse=True))
         
-        current_mode_print = current_mode.capitalize()
         message_lines = [f"{key.replace('_print', '').capitalize()} => {format_time(value)}" for key, value in sorted_values.items()]
-        return f"Current Mode: {current_mode_print}\n\n" + "\n\n".join(message_lines)
+        return f"Current Mode: {current_mode}\n\n" + "\n\n".join(message_lines)
     
     return "/hacker\n/money\n/playboy\n/summary"
 
