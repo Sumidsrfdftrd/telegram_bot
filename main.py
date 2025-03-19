@@ -7,7 +7,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 mode_times = {"hacker": 0, "money": 0, "playboy": 0}
 current_mode = None
-start_time = time.time()
+start_time = None
 # Load environment variables
 TOKEN = os.getenv("TOKEN")  # Set this in Railway's environment variables
 PORT = int(os.environ.get("PORT", 8080))  # Railway assigns this dynamically
