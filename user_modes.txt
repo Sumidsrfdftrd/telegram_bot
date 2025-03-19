@@ -1,0 +1,1 @@
+{"mode": "hacker", "start_time": 1742364741.5296538, "total_time": {"hacker": 721.4800050258636, "money": 0, "playboy": 6064.122445106506}}
