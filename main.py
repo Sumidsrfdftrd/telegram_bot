@@ -45,6 +45,7 @@ class TelegramWebhookHandler(BaseHTTPRequestHandler):
 
 # Handle user messages
 def handle_message(text):
+    global current_mode, mode_times
     current_time = time.time()
     if current_mode is not None:
             elapsed_time = current_time - start_time
